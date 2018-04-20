@@ -58,8 +58,9 @@ demander_repertoireInstall () {
 	if [ "x$REP_CHOISIT" = "x" ]; then
        REPERTOIRE_GOGS=$REPERTOIRE_GOGS_PAR_DEFAUT
 	fi
-	
-	REPERTOIRE_GOGS=$REP_CHOISIT
+	else
+		REPERTOIRE_GOGS=$REP_CHOISIT
+	fi
 	echo " Répertoire choisit pour l'installation https://gogs.io : $REP_CHOISIT";
 }
 # --------------------------------------------------------------------------------------------------------------------------------------------
