@@ -1,11 +1,10 @@
 #!/bin/bash
 # installation de Docker sur centos 7
 																						
-# update CentOS 7
-sudo yum clean all -y && sudo yum update -y
+
 # DOCKER EASE BARE-METAL-INSTALL - CentOS 7
-sudo systemctl stop docker
-sudo systemctl start docker
+# sudo systemctl stop docker
+# sudo systemctl start docker
 
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,10 +51,8 @@ demander_addrIP () {
 
 demander_repertoireInstall () {
 
-	echo "Dans quel répertoire souhaitez-vosu installer Gogs?"
+	echo "Dans quel répertoire souhaitez-vous installer Gogs?"
 	echo "(par défaut, il sera installé dans [/opt/gogs] )"
-	echo " "
-	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
 	echo " "
 	read REP_CHOISIT
 	if [ "x$REP_CHOISIT" = "x" ]; then
@@ -102,15 +99,23 @@ resoudreDependances () {
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
 echo " +++provision+gogsy+  COMMENCEE  - " >> $NOMFICHIERLOG
+
+
+# PARTIE INTERACTIVE
+demander_repertoireInstall
+demander_addrIP
+
+
+# PARTIE SILENCIEUSE
+
+# update CentOS 7
+sudo yum clean all -y && sudo yum update -y
+
+# création des répertoires utilisés par les opérations
 mkdir -p $MAISON_OPERATIONS
 mkdir -p $DEPENDANCES_GOGS_IO
 
 cd $MAISON_OPERATIONS
-
-
-
-demander_repertoireInstall
-demander_addrIP
 
 # Pour l'instant, je skip Docker, je n'en veux pas, je verrai après pour une isntallation dans un conteneur docker.
 # sudo chmod +x ./docker-EASE-SPACE-BARE-METAL-SETUP.sh >> $NOMFICHIERLOG
@@ -125,23 +130,30 @@ echo " +++provision+gogsy+ Installation de Git" >> $NOMFICHIERLOG
 # J'écrirai un script séparé pour procéder à la configuration de l'isntance Gogs.
 resoudreDependances
 
+
+
+sudo yum install -y unzip >> $NOMFICHIERLOG
+
 clear
 
 echo "------"
 echo "------"
 echo "------"
 echo "------"
-echo "DEBUG"
+echo "DEBUG  Juste avant unzip "
+echo " "
 echo " -- Contenu de [DEPENDANCES_GOGS_IO=$DEPENDANCES_GOGS_IO] ( doit contenir \"linux_amd64.zip\"): "
 sudo ls -all $DEPENDANCES_GOGS_IO
 echo "------"
+echo " "
+echo " -- Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
+sudo ls -all $REPERTOIRE_GOGS
 echo "------"
 echo "------"
 echo "------"
-echo "---	Pressez uen touche pour poursuivre les opérations"
+echo "------"
+echo "---	Pressez une touche pour poursuivre les opérations"
 read deboggue
-
-sudo yum install -y unzip >> $NOMFICHIERLOG
 
 unzip $DEPENDANCES_GOGS_IO/linux_amd64.zip -d $REPERTOIRE_GOGS
 
