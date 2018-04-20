@@ -150,12 +150,23 @@ sudo ls -all $DEPENDANCES_GOGS_IO
 echo "------"
 echo " "
 echo " -- Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
+sudo ls -all $REPERTOIRE_GOGS/..
+echo "------"
+echo " "
+echo " -- Contenu Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
 sudo ls -all $REPERTOIRE_GOGS
 echo "------"
 echo "------"
 echo "------"
+echo "-----	  Commande droits sur répertoire : "
+echo "-----	[ PROVISIONING_USER=$PROVISIONING_USER] "
+echo "-----	[ PROVISIONING_USERGROUP=$PROVISIONING_USERGROUP] "
+echo "-----	[ chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS ] "
 echo "------"
-echo "---	Pressez une touche pour poursuivre les opérations"
+echo "------"
+echo "------"
+echo "------"
+echo "---	Pressez une touche pour poursuivre les opérations "
 read deboggue
 
 unzip $DEPENDANCES_GOGS_IO/linux_amd64.zip -d $REPERTOIRE_GOGS
