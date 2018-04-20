@@ -13,7 +13,8 @@
 ##############################################################################################################################################
 # --------------------------------------------------------------------------------------------------------------------------------------------
 export MAISON_OPERATIONS
-MAISON_OPERATIONS=$(pwd)/provision-gogs-io
+# MAISON_OPERATIONS=$(pwd)/provision-gogs-io
+MAISON_OPERATIONS=$(pwd)
 export DEPENDANCES_GOGS_IO
 DEPENDANCES_GOGS_IO=$MAISON_OPERATIONS/dependances
 export ADRESSE_IP_SRV_GOGS
@@ -112,8 +113,10 @@ demander_addrIP
 sudo yum clean all -y && sudo yum update -y
 
 # création des répertoires utilisés par les opérations
-mkdir -p $MAISON_OPERATIONS
+# mkdir -p $MAISON_OPERATIONS
 mkdir -p $DEPENDANCES_GOGS_IO
+sudo mkdir -p $REPERTOIRE_GOGS
+sudo chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS
 
 cd $MAISON_OPERATIONS
 
