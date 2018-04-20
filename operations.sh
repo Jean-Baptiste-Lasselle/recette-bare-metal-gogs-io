@@ -57,7 +57,6 @@ demander_repertoireInstall () {
 	read REP_CHOISIT
 	if [ "x$REP_CHOISIT" = "x" ]; then
        REPERTOIRE_GOGS=$REPERTOIRE_GOGS_PAR_DEFAUT
-	fi
 	else
 		REPERTOIRE_GOGS=$REP_CHOISIT
 	fi
