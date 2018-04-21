@@ -14,7 +14,9 @@ mkdir -p $MAISON_OPERATIONS && cd $MAISON_OPERATIONS && git clone $URI_REPO_RECE
 
 # POINT REPRISE
 
-Il y a de l'installation annexe à faire, dixit la [documentation de Gogs](https://gogs.io/docs/installation) :
+* Tester que le unzip se fait bien.
+* Ajouter la provision de la BDD, et déterminer comment effectuer une configuration automatisée de Gogs, à la fois sur la configuration du réseau, et de la BDD.
+* installation annexe à faire, dixit la [documentation de Gogs](https://gogs.io/docs/installation) :
 
 ```
 Prerequisites
