@@ -173,6 +173,15 @@ unzip $DEPENDANCES_GOGS_IO/linux_amd64.zip -d $REPERTOIRE_GOGS
 
 cd $REPERTOIRE_GOGS/gogs
 
+
+# Je sais pas pourquoi, j'ai juste testé / vérifié en suivant les tickets Gogs
+# J'ai testé:
+#   - que sans installer toutes ces dépendances, le serveur gogs ne démarre pas.
+#   - qu'après avoir installé touters ces dépedances, le serveur Gogs démarre et
+#     demande la configurationde la bdd et la configuration réseau du serveur (ports et interfaces réseau utilisées)
+#   
+sudo yum install -y glibc.i686 libstdc++.so.6 pam.i686 ksh
+
 ./gogs web
 
 
