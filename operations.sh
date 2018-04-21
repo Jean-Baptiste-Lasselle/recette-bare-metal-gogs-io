@@ -169,7 +169,9 @@ echo "------"
 echo "---	Pressez une touche pour poursuivre les opérations "
 read deboggue
 
-unzip $DEPENDANCES_GOGS_IO/linux_amd64.zip -d $REPERTOIRE_GOGS
+sudo unzip $DEPENDANCES_GOGS_IO/linux_amd64.zip -d $REPERTOIRE_GOGS
+
+sudo chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS
 
 cd $REPERTOIRE_GOGS/gogs
 
