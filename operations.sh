@@ -334,6 +334,11 @@ echo " "
 echo "##########################################################"
 echo "##########################################################"
 
+echo "########### "
+echo "########### "
+echo "########### Installation gogs en cours..."
+echo "########### "
+
 # PARTIE SILENCIEUSE
 
 # on rend les scripts à exécuter, exécutables.

@@ -12,18 +12,18 @@
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # export MAISON_OPERATIONS
 # MAISON_OPERATIONS=$(pwd)
--
+# -
 # export NOMFICHIERLOG
 # NOMFICHIERLOG="$(pwd)/provision-gogsy.log"
 # - 
 # export ADRESSE_IP_BDD_GOGS
 # export ADRESSE_IP_BDD_GOGS_PAR_DEFAUT
 # ADRESSE_IP_BDD_GOGS_PAR_DEFAUT=0.0.0.0
--
+# -
 # export NO_PORT_BDD_GOGS
 # export NO_PORT_BDD_GOGS_PAR_DEFAUT
 # NO_PORT_BDD_GOGS_PAR_DEFAUT=8564
--
+# -
 # export MOTDEPASSEBDDGOGS
 # export MOTDEPASSEBDDGOGS_PAR_DEFAUT
 # MOTDEPASSEBDDGOGS_PAR_DEFAUT=punkybrewster
