@@ -163,7 +163,7 @@ RUN yum install -y glibc.i686 libstdc++.so.6 pam.i686 ksh
 # -
 
 #####################
-# HEALTH_CHECK
+# HEALTH_CHECK gogs
 HEALTHCHECK CMD curl --fail http://localhost:3000/ || exit 1
 #####################
 # ENRYPOINT
