@@ -1,5 +1,5 @@
 #!/bin/bash
-# installation de Docker sur centos 7
+# Hôte Docker sur centos 7
 																						
 
 # DOCKER BARE-METAL-INSTALL - CentOS 7
