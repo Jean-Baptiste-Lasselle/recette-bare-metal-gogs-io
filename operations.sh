@@ -62,6 +62,16 @@ NOM_CONTENEUR_BDD_GOGS_PAR_DEFAUT=bdd-gogs.punky
 # permettant de redéfinir le nom du conteneur docker
 # pour ma distrib.
 NOM_CONTENEUR_BDD_GOGS=$NOM_CONTENEUR_BDD_GOGS_PAR_DEFAUT
+
+export NOM_CONTNEUR_SRV_GOGS
+export NOM_CONTNEUR_SRV_GOGS_PAR_DEFAUT
+NOM_CONTNEUR_SRV_GOGS_PAR_DEFAUT=srv-gogs.punky
+# Pas de question interactive, ou de paramètre
+# permettant de redéfinir le nom du conteneur docker
+# pour ma distrib.
+NOM_CONTNEUR_SRV_GOGS=$NOM_CONTNEUR_SRV_GOGS_PAR_DEFAUT
+
+
 # --------------------------------------------------------------------------------------------------------------------------------------------
 ##############################################################################################################################################
 #########################################							FONCTIONS						##########################################
@@ -125,7 +135,7 @@ demander_mdp_BddGogs () {
 # script, quelle est l'adresse IP, dans l'hôte Docker, que l'instance de SGBDR pourra utiliser
 demander_addrIP_ServeurGogs () {
 
-	echo "Quelle adresse IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
+	echo "Quelle adresse IP souhaitez-vous que le Gogs utilise?"
 	echo "Cette adresse est à  choisir parmi:"
 	echo " "
 	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
@@ -136,7 +146,7 @@ demander_addrIP_ServeurGogs () {
 	else
 	ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_CHOISIE
 	fi
-	echo " Binding Adresse IP choisit pour le SGBDR de la BDD Gogs: $ADRESSE_IP_SRV_GOGS";
+	echo " Binding Adresse IP choisit pour le serveur Gogs: $ADRESSE_IP_SRV_GOGS";
 }
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # Cette fonction permet de demander interactivement à l'utilisateur du
@@ -148,11 +158,11 @@ demander_noportIP_ServeurGogs () {
 	echo " "
 	read NOPORT_IP_CHOISIT
 	if [ "x$NOPORT_IP_CHOISIT" = "x" ]; then
-       NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS_PAR_DEFAUT
+       NO_PORT_SRV_GOGS=$NO_PORT_SRV_GOGS_PAR_DEFAUT
 	else
-      NO_PORT_BDD_GOGS=$NOPORT_IP_CHOISIT
+      NO_PORT_SRV_GOGS=$NOPORT_IP_CHOISIT
 	fi
-	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NO_PORT_BDD_GOGS";
+	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NO_PORT_SRV_GOGS";
 }
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # Cette fonction permet de demander interactivement à l'utilisateur du
@@ -160,7 +170,7 @@ demander_noportIP_ServeurGogs () {
 # pour se conencter en SSH à l'instance de Gogs
 demander_noportIP_ServeurSSHGogs () {
 
-	echo "Quel numéro de port IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
+	echo "Quel numéro de port IP souhaitez-vous que le serveur Gogs utilise pour les opérations Git via SSH?"
 	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
 	echo " "
 	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
@@ -252,15 +262,81 @@ echo " +++provision+gogsy+  COMMENCEE  - " >> $NOMFICHIERLOG
 
 
 # PARTIE INTERACTIVE
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo " "
+
 demander_addrIP_BddGogs
+
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo " "
+
 demander_noportIP_BddGogs
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo " "
+
 demander_mdp_BddGogs
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo " "
+
 demander_addrIP_ServeurGogs
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo " "
+
 demander_noportIP_ServeurGogs
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo " "
+
 demander_noportIP_ServeurSSHGogs
 
-# PARTIE SILENCIEUSE
 
+
+echo " " >> $NOMFICHIERLOG
+echo "##########################################################" >> $NOMFICHIERLOG
+echo "##########################################################" >> $NOMFICHIERLOG
+echo "# Récapitulatif:" >> $NOMFICHIERLOG
+echo " 		[ADRESSE_IP_BDD_GOGS=$ADRESSE_IP_BDD_GOGS]" >> $NOMFICHIERLOG
+echo " 		[NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS]" >> $NOMFICHIERLOG
+echo " 		[MOTDEPASSEBDDGOGS=$MOTDEPASSEBDDGOGS]" >> $NOMFICHIERLOG
+echo " 		[ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_SRV_GOGS]" >> $NOMFICHIERLOG
+echo " 		[NO_PORT_SRV_GOGS=$NO_PORT_SRV_GOGS]" >> $NOMFICHIERLOG
+echo " 		[NO_PORT_SSH_SRV_GOGS=$NO_PORT_SSH_SRV_GOGS]" >> $NOMFICHIERLOG
+clear
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+echo "# Récapitulatif:"
+echo " 		[ADRESSE_IP_BDD_GOGS=$ADRESSE_IP_BDD_GOGS]"
+echo " 		[NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS]"
+echo " 		[MOTDEPASSEBDDGOGS=$MOTDEPASSEBDDGOGS]"
+echo " 		[ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_SRV_GOGS]"
+echo " 		[NO_PORT_SRV_GOGS=$NO_PORT_SRV_GOGS]"
+echo " 		[NO_PORT_SSH_SRV_GOGS=$NO_PORT_SSH_SRV_GOGS]"
+echo " "
+echo " "
+echo " "
+echo " "
+echo "##########################################################"
+echo "##########################################################"
+
+# PARTIE SILENCIEUSE
 
 # on rend les scripts à exécuter, exécutables.
 sudo chmod +x ./provision-bdd.sh >> $NOMFICHIERLOG
@@ -290,5 +366,16 @@ checkHealth $NOM_CONTENEUR_BDD_GOGS
 
 ./provision-srv-gogs.sh >> $NOMFICHIERLOG
 
+# DOnc vérfier quel est le HEALTH_CHECK implémenté pour Gogos. Hum, il n'y en a pas....:
+# Donc il faut que je fasse le mien avec une requête http vers http://$ADRESSE_IP_SRV_GOGS:$NO_PORT_SRV_GOGS
+# Ah, mais si la requête est lancé depusi l'intérieur du conteneur, alors.... il faut que j'utilsie le numéro~
+# de port 3000, qui est celui utilisé à l'intérieur du conteneur, puisque je ne change pas cette configuration Gogs à l'intérieur de mon conteneur.
+# Donc une requête http vers http://$ADRESSE_IP_SRV_GOGS:3000
+# Donc mieux, pour rendre le HEALTH_CHECK indépendant de la cible de déploiement, une requête http vers http://localhost:3000
+# Ce HEALTH_CHECK peut être complété, indépendant de la recetted e rpovision, par des tersts divers dont uen requête spécifique à la cible de déploiement, comme 
+checkHealth $NOM_CONTNEUR_SRV_GOGS
 
+# Et là, on SAIT , que l'ensemble a été provisionné correctement)
 
+echo " 		[ADRESSE_IP_SRV_GOGS=]" >> $NOMFICHIERLOG
+echo " 		[NO_PORT_SRV_GOGS=]" >> $NOMFICHIERLOG
