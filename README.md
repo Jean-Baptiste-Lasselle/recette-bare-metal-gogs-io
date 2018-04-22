@@ -14,6 +14,7 @@ mkdir -p $MAISON_OPERATIONS && cd $MAISON_OPERATIONS && git clone $URI_REPO_RECE
 
 # POINT REPRISE
 
+* TODO: Création de la BDD `gogs` dans  PostGreSQL, ave cle script `provision-bdd.sh`
 * Tester que le unzip se fait bien.
 * Ajouter la provision de la BDD, et déterminer comment effectuer une configuration automatisée de Gogs, à la fois sur la configuration du réseau, et de la BDD.
 * Installation annexe à faire, dixit la [documentation de Gogs](https://gogs.io/docs/installation) :
@@ -53,6 +54,26 @@ Valider les paramètres d'intégration:
 *  Vérifier s'il faut installer un environnement Go, pour la simple exécution (je ne pense pas la distribution est structurée par version d'OS)
 
 # TODOs
+
+* Développer le healthcheck spécifique à l'orchestration PostGreSQL / Gogs.io :
+# --------------------------------------------------------------------------------------------------------------------------------------------
+# 			NOUVELLE PORVISIO PAR DES CONTENURS
+# --------------------------------------------------------------------------------------------------------------------------------------------
+
+# 1. conteneur BDD
+./provision-bdd.sh >> $NOMFICHIERLOG
+# => HealthCheck modifié: le helth doit comprendre non pas la disponibilité seule du SGBDR PostGreSQL, mais
+#	 un custom Healthcheck qui vva se connecter avec l'utilisateur prévu pour Gogs, sur la BDD de nom "gogs", avec une
+#    requête SQL [use gogs; SELECT 1;], voir une script SQL entier qui créée puis détruit uen table, voir un script SQL
+#    entier qui vérifie toutes les actiosn nécessitant des droits, pour valider tous les droits les uns après les autres.
+#    Non, ce qui doit être vérifié dans le HELTYH CHECK avec de la requête SQL, c'est:
+#	 	1./ la disponibilité du SGBDR
+#       2./ L'existence de la BDD
+#       3./ le succès de l'authentification du (des) user(s) PostGreSQL utilisé(s) par http://gogs.io
+# ===================>>>> Vérifier si ce HealthCheck Customisé est bien utilisé par le docker-compose up à partir du docker-compose.yml
+# 2. Conteneur Serveur
+./provision-srv-gogs.sh >> $NOMFICHIERLOG
+
 
 * configuration sécurisée et haute dispo 
 * opérations standard d'exploitation:
