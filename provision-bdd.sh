@@ -11,18 +11,20 @@
 ##############################################################################################################################################
 # --------------------------------------------------------------------------------------------------------------------------------------------
 export MAISON_OPERATIONS
-# MAISON_OPERATIONS=$(pwd)/provision-gogs-io
 MAISON_OPERATIONS=$(pwd)
-export DEPENDANCES_GOGS_IO
-DEPENDANCES_GOGS_IO=$MAISON_OPERATIONS/dependances
-export ADRESSE_IP_SRV_GOGS
-export MOTDEPASSEBDDGOGS=
-export MOTDEPASSEBDDGOGS_PAR_DEFAUT
-MOTDEPASSEBDDGOGS_PAR_DEFAUT=punkybrewster
 export NOMFICHIERLOG
 NOMFICHIERLOG="$(pwd)/provision-gogsy.log"
-rm -f $NOMFICHIERLOG
-touch $NOMFICHIERLOG
+# -
+export DEPENDANCES_GOGS_IO
+DEPENDANCES_GOGS_IO=$MAISON_OPERATIONS/dependances
+export ADRESSE_IP_BDD_GOGS
+export ADRESSE_IP_BDD_GOGS_PAR_DEFAUT
+ADRESSE_IP_BDD_GOGS_PAR_DEFAUT=0.0.0.0
+export MOTDEPASSEBDDGOGS
+export MOTDEPASSEBDDGOGS_PAR_DEFAUT
+MOTDEPASSEBDDGOGS_PAR_DEFAUT=punkybrewster
+
+
 # --------------------------------------------------------------------------------------------------------------------------------------------
 ##############################################################################################################################################
 #########################################							FONCTIONS						##########################################
@@ -39,16 +41,16 @@ demander_addrIP_BddGogs () {
 	echo " "
 	read ADRESSE_IP_CHOISIE
 	if [ "x$ADRESSE_IP_CHOISIE" = "x" ]; then
-       ADRESSE_IP_CHOISIE=0.0.0.0
+       ADRESSE_IP_BDD_GOGS=ADRESSE_IP_BDD_GOGS_PAR_DEFAUT
 	else
-	ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_CHOISIE
+	ADRESSE_IP_BDD_GOGS=$ADRESSE_IP_CHOISIE
 	fi
-	echo " Binding Adresse IP choisit pour le SGBDR de la BDD Gogs: $ADRESSE_IP_CHOISIE";
+	echo " Binding Adresse IP choisit pour le SGBDR de la BDD Gogs: $ADRESSE_IP_BDD_GOGS";
 }
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # Cette fonction permet de demander interactivement à l'utilisateur du
 # script, quelle est le numéro de port IP, dans l'hôte Docker, que l'instance de SGBDR pourra utiliser
-demander_addrIP_BddGogs () {
+demander_noportIP_BddGogs () {
 
 	echo "Quel numéro de port IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
 	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
@@ -61,7 +63,7 @@ demander_addrIP_BddGogs () {
 	else
       NO_PORT_BDD_GOGS=$NOPORT_IP_CHOISIT
 	fi
-	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NOPORT_IP_CHOISIT";
+	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NO_PORT_BDD_GOGS";
 }
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +80,7 @@ demander_mdp_BddGogs () {
 	else
 		MOTDEPASSEBDDGOGS=$MDP_CHOISIT
 	fi
-	echo " Mot de passe choisit pour l'installation de la BDD Gogs : $MDP_CHOISIT";
+	echo " Mot de passe choisit pour l'installation de la BDD Gogs : $MOTDEPASSEBDDGOGS";
 }
 
 
@@ -96,12 +98,16 @@ demander_mdp_BddGogs () {
 # 
 # 
 # 
+rm -f $NOMFICHIERLOG
+touch $NOMFICHIERLOG
 echo " +++provision+gogsy+bdd  COMMENCEE  - " >> $NOMFICHIERLOG
 
 
 # PARTIE INTERACTIVE
-demander_repertoireInstall
-demander_addrIP
+demander_addrIP_BddGogs
+demander_noportIP_BddGogs
+demander_mdp_BddGogs
+
 
 
 # PARTIE SILENCIEUSE
@@ -111,42 +117,39 @@ sudo yum clean all -y && sudo yum update -y
 
 # création des répertoires utilisés par les opérations
 # mkdir -p $MAISON_OPERATIONS
-mkdir -p $DEPENDANCES_GOGS_IO
-sudo mkdir -p $REPERTOIRE_GOGS
-sudo chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS
-
 cd $MAISON_OPERATIONS
 
 sudo docker run --name some-postgres -e POSTGRES_PASSWORD=$MOTDEPASSEBDDGOGS -d postgres
 
+###############################
+# TODO: Création de la BDD gogs
+# une fois le conteneur lancé, 
+# il faut créer la BDD "gogs",
+# et vérifier l'accès et droits
+# de l'utilisateur sur la BDD
+# gogs
+# -
+# 
 clear
 
 echo "------"
 echo "------"
 echo "------"
 echo "------"
-echo "DEBUG  Juste avant unzip "
+echo "DEBUG  Juste avant docker run BDD "
 echo " "
-echo " -- Contenu de [DEPENDANCES_GOGS_IO=$DEPENDANCES_GOGS_IO] ( doit contenir \"linux_amd64.zip\"): "
-sudo ls -all $DEPENDANCES_GOGS_IO
-echo "------"
+echo " -- images docker: "
+sudo docker images
 echo " "
-echo " -- Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
-sudo ls -all $REPERTOIRE_GOGS/..
-echo "------"
+echo " -- conteneurs docker: "
+sudo docker images
 echo " "
-echo " -- Contenu Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
-sudo ls -all $REPERTOIRE_GOGS
-echo "------"
-echo "------"
-echo "------"
-echo "-----	  Commande droits sur répertoire : "
-echo "-----	[ PROVISIONING_USER=$PROVISIONING_USER] "
-echo "-----	[ PROVISIONING_USERGROUP=$PROVISIONING_USERGROUP] "
-echo "-----	[ chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS ] "
-echo "------"
-echo "------"
-echo "------"
+echo " "
+echo " "
+echo " --  [ADRESSE_IP_BDD_GOGS=$ADRESSE_IP_BDD_GOGS]  "
+echo " --  [NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS]  "
+echo " --  [MOTDEPASSEBDDGOGS=$MOTDEPASSEBDDGOGS]  "
+echo " "
 echo "------"
 echo "---	Pressez une touche pour poursuivre les opérations "
 read deboggue
