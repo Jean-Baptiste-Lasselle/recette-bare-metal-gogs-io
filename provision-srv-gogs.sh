@@ -141,7 +141,7 @@ read deboggue
 LISTE_OPTION_RESEAU=" -e $ADRESSE_IP_SRV_GOGS:$NO_PORT_SRV_GOGS:3000"
 LISTE_OPTION_RESEAU="$LISTE_OPTION_RESEAU -e $ADRESSE_IP_SRV_GOGS:$NO_PORT_SSH_SRV_GOGS:22"
 
-sudo docker run --name $NOM_CONTNEUR_SRV_GOGS --restart=always $NOM_IMAGE_GOGS_IO
+sudo docker run --name $NOM_CONTNEUR_SRV_GOGS $LISTE_OPTION_RESEAU --restart=always $NOM_IMAGE_GOGS_IO
 
 # Attention!: à cet instant précis, les heathcheck n'ont pas encore été faits.
 echo " +++provision+gogsy+serveur  COMMENCEE  - "

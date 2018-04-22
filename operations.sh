@@ -55,6 +55,13 @@ export REPERTOIRE_GOGS
 export REPERTOIRE_GOGS_PAR_DEFAUT
 REPERTOIRE_GOGS_PAR_DEFAUT=/opt/gogs
 
+export NOM_CONTENEUR_BDD_GOGS
+export NOM_CONTENEUR_BDD_GOGS_PAR_DEFAUT
+NOM_CONTENEUR_BDD_GOGS_PAR_DEFAUT=bdd-gogs.punky
+# Pas de question interactive, ou de paramètre
+# permettant de redéfinir le nom du conteneur docker
+# pour ma distrib.
+NOM_CONTENEUR_BDD_GOGS=$NOM_CONTENEUR_BDD_GOGS_PAR_DEFAUT
 # --------------------------------------------------------------------------------------------------------------------------------------------
 ##############################################################################################################################################
 #########################################							FONCTIONS						##########################################
@@ -196,6 +203,40 @@ resoudreDependances () {
 
 }
 
+# --------------------------------------------------------------------------------------------------------------------------------------------
+# 
+# Cette fonction permet d'attendre que le conteneur soit dans l'état healthy
+# Cette fonction prend un argument, nécessaire sinon une erreur est générée (TODO: à implémenter avec exit code)
+checkHealth () {
+	export ETATCOURANTCONTENEUR=starting
+	export ETATCONTENEURPRET=healthy
+	export NOM_DU_CONTENEUR_INSPECTE=$1
+	
+	while  $(echo "+provision+girofle+ $NOM_DU_CONTENEUR_INSPECTE - HEALTHCHECK: [$ETATCOURANTCONTENEUR]">> $NOMFICHIERLOG); do
+	
+	ETATCOURANTCONTENEUR=$(sudo docker inspect -f '{{json .State.Health.Status}}' $NOM_DU_CONTENEUR_INSPECTE)
+	if [ $ETATCOURANTCONTENEUR == "\"healthy\"" ]
+	then
+		echo "+provision+girofle+ $NOM_DU_CONTENEUR_INSPECTE est prêt - HEALTHCHECK: [$ETATCOURANTCONTENEUR]">> $NOMFICHIERLOG
+		break;
+	else
+		echo "+provision+girofle+ $NOM_DU_CONTENEUR_INSPECTE n'est pas prêt - HEALTHCHECK: [$ETATCOURANTCONTENEUR] - attente d'une seconde avant prochain HealthCheck - ">> $NOMFICHIERLOG
+		sleep 1s
+	fi
+	done
+	
+	# DEBUG LOGS
+	echo " provision-girofle-  ------------------------------------------------------------------------------ " >> $NOMFICHIERLOG
+	echo " provision-girofle-  - Contenu du répertoire [/etc/gitlab] dans le conteneur [$NOM_DU_CONTENEUR_INSPECTE]:" >> $NOMFICHIERLOG
+	echo " provision-girofle-  - " >> $NOMFICHIERLOG
+	sudo docker exec -it $NOM_DU_CONTENEUR_INSPECTE /bin/bash -c "ls -all /etc/gitlab" >> $NOMFICHIERLOG
+	echo " provision-girofle-  ------------------------------------------------------------------------------ " >> $NOMFICHIERLOG
+	echo " provision-girofle-  - Existence du fichier [/etc/gitlab/gitlab.rb] dans le conteneur  [$NOM_DU_CONTENEUR_INSPECTE]:" >> $NOMFICHIERLOG
+	echo " provision-girofle-  - " >> $NOMFICHIERLOG
+	sudo docker exec -it $NOM_DU_CONTENEUR_INSPECTE /bin/bash -c "ls -all /etc/gitlab/gitlab.rb" >> $NOMFICHIERLOG
+	echo " provision-girofle-  - " >> $NOMFICHIERLOG
+	echo " provision-girofle-  ------------------------------------------------------------------------------ " >> $NOMFICHIERLOG
+}
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 ##############################################################################################################################################
@@ -220,18 +261,14 @@ demander_noportIP_ServeurSSHGogs
 
 # PARTIE SILENCIEUSE
 
-# update CentOS 7
-sudo yum clean all -y && sudo yum update -y
 
-
-######################
-# Installation Docker
-# Pour la création du conteneur docker pour la BDD Gogs, cf. provision-bdd.sh
-sudo chmod +x ./docker-BARE-METAL-SETUP.sh >> $NOMFICHIERLOG
+# on rend les scripts à exécuter, exécutables.
 sudo chmod +x ./provision-bdd.sh >> $NOMFICHIERLOG
 sudo chmod +x ./provision-srv-gogs.sh >> $NOMFICHIERLOG
+sudo chmod +x ./provision-hote-docker.sh >> $NOMFICHIERLOG
 
-./docker-BARE-METAL-SETUP.sh >> $NOMFICHIERLOG
+# provision hôte docker
+./provision-hote-docker.sh >> $NOMFICHIERLOG
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # 			NOUVELLE PORVISIO PAR DES CONTENURS
@@ -249,6 +286,8 @@ sudo chmod +x ./provision-srv-gogs.sh >> $NOMFICHIERLOG
 #       3./ le succès de l'authentification du (des) user(s) PostGreSQL utilisé(s) par http://gogs.io
 # ===================>>>> Vérifier si ce HealthCheck Customisé est bien utilisé par le docker-compose up à partir du docker-compose.yml
 # 2. Conteneur Serveur
+checkHealth $NOM_CONTENEUR_BDD_GOGS
+
 ./provision-srv-gogs.sh >> $NOMFICHIERLOG
 
 
