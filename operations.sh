@@ -366,16 +366,27 @@ checkHealth $NOM_CONTENEUR_BDD_GOGS
 
 ./provision-srv-gogs.sh >> $NOMFICHIERLOG
 
-# DOnc vérfier quel est le HEALTH_CHECK implémenté pour Gogos. Hum, il n'y en a pas....:
+# Donc vérfier quel est le HEALTH_CHECK implémenté pour Gogos. Hum, il n'y en a pas....:
 # Donc il faut que je fasse le mien avec une requête http vers http://$ADRESSE_IP_SRV_GOGS:$NO_PORT_SRV_GOGS
 # Ah, mais si la requête est lancé depusi l'intérieur du conteneur, alors.... il faut que j'utilsie le numéro~
 # de port 3000, qui est celui utilisé à l'intérieur du conteneur, puisque je ne change pas cette configuration Gogs à l'intérieur de mon conteneur.
 # Donc une requête http vers http://$ADRESSE_IP_SRV_GOGS:3000
 # Donc mieux, pour rendre le HEALTH_CHECK indépendant de la cible de déploiement, une requête http vers http://localhost:3000
-# Ce HEALTH_CHECK peut être complété, indépendant de la recetted e rpovision, par des tersts divers dont uen requête spécifique à la cible de déploiement, comme 
+# Ce HEALTH_CHECK peut être complété, indépendant de la recette de rpovision, par des tersts divers dont uen requête spécifique à la cible de déploiement, comme 
 checkHealth $NOM_CONTNEUR_SRV_GOGS
 
 # Et là, on SAIT , que l'ensemble a été provisionné correctement)
-
-echo " 		[ADRESSE_IP_SRV_GOGS=]" >> $NOMFICHIERLOG
-echo " 		[NO_PORT_SRV_GOGS=]" >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  Votre serveur Gogs est disponible à l'URI:" >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  	[http://$ADRESSE_IP_SRV_GOGS:$NO_PORT_SRV_GOGS/]" >> $NOMFICHIERLOG
+clear
+echo " +++provision+gogsy+  --- " >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  Votre serveur Gogs est disponible à l'URI:" >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  - " >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  	[http://$ADRESSE_IP_SRV_GOGS:$NO_PORT_SRV_GOGS/]" >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  --- " >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  Le log des opérations de provisions gogsy sont disponibles dans le fichier:" >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  - " >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  	[$NOMFICHIERLOG]" >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  - " >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  TERMINEE  - " >> $NOMFICHIERLOG
+echo " +++provision+gogsy+  - " >> $NOMFICHIERLOG
