@@ -56,6 +56,7 @@ Valider les paramètres d'intégration:
 # TODOs
 
 * Développer le healthcheck spécifique à l'orchestration PostGreSQL / Gogs.io :
+```
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # 			NOUVELLE PORVISIO PAR DES CONTENURS
 # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,6 +84,6 @@ Valider les paramètres d'intégration:
 * Test autommatisés:
   * De la limite du nombre de repos avec 2 machines de tailles significativement différentes
 * Regarder rapidement les possibilités de customisation CSS
-
+```
 
 
