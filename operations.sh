@@ -173,8 +173,6 @@ demander_noportIP_ServeurSSHGogs () {
 	echo "Quel numéro de port IP souhaitez-vous que le serveur Gogs utilise pour les opérations Git via SSH?"
 	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
 	echo " "
-	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
-	echo " "
 	read NOPORTSSH_IP_CHOISIT
 	if [ "x$NOPORTSSH_IP_CHOISIT" = "x" ]; then
        NO_PORT_SSH_SRV_GOGS=$NO_PORT_SSH_SRV_GOGS_PAR_DEFAUT
