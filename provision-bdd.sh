@@ -2,9 +2,7 @@
 # installation de Docker sur centos 7
 																						
 
-# DOCKER BARE-METAL-INSTALL - CentOS 7
-# sudo systemctl stop docker
-# sudo systemctl start docker
+
 
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -18,9 +16,9 @@ MAISON_OPERATIONS=$(pwd)
 export DEPENDANCES_GOGS_IO
 DEPENDANCES_GOGS_IO=$MAISON_OPERATIONS/dependances
 export ADRESSE_IP_SRV_GOGS
-export REPERTOIRE_GOGS
-export REPERTOIRE_GOGS_PAR_DEFAUT
-REPERTOIRE_GOGS_PAR_DEFAUT=/opt/gogs
+export MOTDEPASSEBDDGOGS=
+export MOTDEPASSEBDDGOGS_PAR_DEFAUT
+MOTDEPASSEBDDGOGS_PAR_DEFAUT=punkybrewster
 export NOMFICHIERLOG
 NOMFICHIERLOG="$(pwd)/provision-gogsy.log"
 rm -f $NOMFICHIERLOG
@@ -30,11 +28,11 @@ touch $NOMFICHIERLOG
 #########################################							FONCTIONS						##########################################
 ##############################################################################################################################################
 # --------------------------------------------------------------------------------------------------------------------------------------------
-# Cette fonction permet de demander iteractivement à l'utilisateur du
-# script, quelle est l'adresse IP, dans l'hôte Docker, que l'instance Gitlab pourra utiliser
-demander_addrIP () {
+# Cette fonction permet de demander interactivement à l'utilisateur du
+# script, quelle est l'adresse IP, dans l'hôte Docker, que l'instance de SGBDR pourra utiliser
+demander_addrIP_BddGogs () {
 
-	echo "Quelle adresse IP souhaitez-vous que l'instance https://gogs.io utilise?"
+	echo "Quelle adresse IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
 	echo "Cette adresse est à  choisir parmi:"
 	echo " "
 	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
@@ -42,55 +40,48 @@ demander_addrIP () {
 	read ADRESSE_IP_CHOISIE
 	if [ "x$ADRESSE_IP_CHOISIE" = "x" ]; then
        ADRESSE_IP_CHOISIE=0.0.0.0
-	fi
-	
-	ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_CHOISIE
-	echo " Binding Adresse IP choisit pour le serveur gitlab: $ADRESSE_IP_CHOISIE";
-}
-
-# --------------------------------------------------------------------------------------------------------------------------------------------
-
-demander_repertoireInstall () {
-
-	echo "Dans quel répertoire souhaitez-vous installer Gogs?"
-	echo "(par défaut, il sera installé dans [/opt/gogs] )"
-	echo " "
-	read REP_CHOISIT
-	if [ "x$REP_CHOISIT" = "x" ]; then
-       REPERTOIRE_GOGS=$REPERTOIRE_GOGS_PAR_DEFAUT
 	else
-		REPERTOIRE_GOGS=$REP_CHOISIT
+	ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_CHOISIE
 	fi
-	echo " Répertoire choisit pour l'installation https://gogs.io : $REP_CHOISIT";
+	echo " Binding Adresse IP choisit pour le SGBDR de la BDD Gogs: $ADRESSE_IP_CHOISIE";
 }
 # --------------------------------------------------------------------------------------------------------------------------------------------
-export WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY
-# WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY=https://github.com/gogits/gogs/releases/download/v0.11.43/linux_amd64.zip
-# WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY=https://dl.gogs.io/0.11.43/gogs_0.11.43_linux_amd64.zip
-WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY=https://cdn.gogs.io/0.11.43/gogs_0.11.43_linux_386.zip
-resoudreDependances () {
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SECURITY ==>> Attention, curl indique que le certifcat de sécurité est expiré ou non valide:
-	# - J'ai vérifié sur le https://cdn.gogs.io , le certificat SSL est valide, l'autorité de 
-	#   Certification est Let's Encrypt, donc le problème est probablement que l'instance curl ne
-	#	reconnaît pas l'autorité de certifcation Let's Encrypt. Il faut donc soit reconnaître cette
-	#	autorité dans le système d'exploitation de l'infrastructure, soit metttre ne place un canal
-	#	pour intégrer / scanner les releases émises par gogs, et les aspirer dans le ssytème d'exploitation de l'infrastructure.
-	curl --insecure $WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY --output linux_amd64.zip
-	mv ./linux_amd64.zip $DEPENDANCES_GOGS_IO
+# Cette fonction permet de demander interactivement à l'utilisateur du
+# script, quelle est le numéro de port IP, dans l'hôte Docker, que l'instance de SGBDR pourra utiliser
+demander_addrIP_BddGogs () {
 
+	echo "Quel numéro de port IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
+	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
+	echo " "
+	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
+	echo " "
+	read NOPORT_IP_CHOISIT
+	if [ "x$NOPORT_IP_CHOISIT" = "x" ]; then
+       NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS_PAR_DEFAUT
+	else
+      NO_PORT_BDD_GOGS=$NOPORT_IP_CHOISIT
+	fi
+	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NOPORT_IP_CHOISIT";
 }
+
+# --------------------------------------------------------------------------------------------------------------------------------------------
+# Cette fonction permet de demander interactivement à l'utilisateur du
+# script, quelle est le mot de passe initial à utiliser pour la provision de PostGreSQL
+demander_mdp_BddGogs () {
+
+	echo "Quel mot de passe souhaitez-vous fixer pour la BDD Gogs?"
+	echo "(par défaut, le mot de passe sera [$MOTDEPASSEBDDGOGS_PAR_DEFAUT] )"
+	echo " "
+	read MDP_CHOISIT
+	if [ "x$MDP_CHOISIT" = "x" ]; then
+       MOTDEPASSEBDDGOGS=$MOTDEPASSEBDDGOGS_PAR_DEFAUT
+	else
+		MOTDEPASSEBDDGOGS=$MDP_CHOISIT
+	fi
+	echo " Mot de passe choisit pour l'installation de la BDD Gogs : $MDP_CHOISIT";
+}
+
+
 
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,8 +89,14 @@ resoudreDependances () {
 #########################################							OPS								##########################################
 ##############################################################################################################################################
 # --------------------------------------------------------------------------------------------------------------------------------------------
-
-echo " +++provision+gogsy+  COMMENCEE  - " >> $NOMFICHIERLOG
+# 
+# Ce script permet de créer et démarrer un conteneur contenant une instance de SGBDR destiné à être utilisé par Gogs.
+# Le SGBDR utilisé est PostGreSQL.
+# 
+# 
+# 
+# 
+echo " +++provision+gogsy+bdd  COMMENCEE  - " >> $NOMFICHIERLOG
 
 
 # PARTIE INTERACTIVE
@@ -120,38 +117,7 @@ sudo chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS
 
 cd $MAISON_OPERATIONS
 
-######################
-# Installation Docker
-# Pour la création du conteneur docker pour la BDD Gogs, cf. provision-bdd.sh
-sudo chmod +x ./docker-BARE-METAL-SETUP.sh >> $NOMFICHIERLOG
-
-./docker-BARE-METAL-SETUP.sh
-
-
-############# 
-############# 
-############# >>>>>>>>>>>>>>>>     Les instructions ci-dessous sont à coller dans un dockerfile.
-############# >>>>>>>>>>>>>>>>     Les variables d'envionnement utilisées dans les instructions
-############# >>>>>>>>>>>>>>>>     ci-dessous, doivent devenir des varibles d'environnement du 
-############# >>>>>>>>>>>>>>>>     conteneur docker, qui seront utilisées au docker run avec l'option "-e"
-############# 
-############# 
-
-#####################
-# Installation de Git
-echo " +++provision+gogsy+ Installation de Git"
-echo " +++provision+gogsy+ Installation de Git" >> $NOMFICHIERLOG
-sudo yum install -y git >> $NOMFICHIERLOG
-echo " +++provision+gogsy+ Fin Installation de Git"
-echo " +++provision+gogsy+ Installation de Git" >> $NOMFICHIERLOG
-
-# Je résouds les dépendances, pour terminer l'installation de Gogs. 
-# J'écrirai un script séparé pour procéder à la configuration de l'isntance Gogs.
-resoudreDependances
-
-
-
-sudo yum install -y unzip >> $NOMFICHIERLOG
+sudo docker run --name some-postgres -e POSTGRES_PASSWORD=$MOTDEPASSEBDDGOGS -d postgres
 
 clear
 
@@ -226,11 +192,11 @@ sudo yum install -y glibc.i686 libstdc++.so.6 pam.i686 ksh
 																					# echo "$PLANIFICATION_DES_BCKUPS" >> ./operations-std/serveur/bckup.kytes
 																					# crontab ./operations-std/serveur/bckup.kytes
 																					# rm -f ./operations-std/serveur/bckup.kytes
-																					# echo " +++provision+gogsy+ Le backup Girafle a été cofniguré pour  " >> $NOMFICHIERLOG
-																					# echo " +++provision+gogsy+ s'exécuter automatiquent de la manière suivante: " >> $NOMFICHIERLOG
-																					# echo " +++provision+gogsy+  " >> $NOMFICHIERLOG
+																					# echo " +++provision+gogsy+bdd+ Le backup Girafle a été cofniguré pour  " >> $NOMFICHIERLOG
+																					# echo " +++provision+gogsy+bdd+ s'exécuter automatiquent de la manière suivante: " >> $NOMFICHIERLOG
+																					# echo " +++provision+gogsy+bdd+  " >> $NOMFICHIERLOG
 																					# crontab -l >> $NOMFICHIERLOG
-																					# echo " +++provision+gogsy+  TERMINEE - " >> $NOMFICHIERLOG
+																					# echo " +++provision+gogsy+bdd+  TERMINEE - " >> $NOMFICHIERLOG
 #    ANNEXE crontab quickies
 # => pour une fois par nuit: [* 1 * * * "$(pwd)/operations-std/serveur/backup.sh"]
 # => pour une toutes les 2 heures: [* */2 * * * "$(pwd)/operations-std/serveur/backup.sh"]

@@ -1,0 +1,157 @@
+FROM postgres:10
+# -------------------------------------------
+# -------------------------------------------
+# -------------------------------------------
+# 						ENV
+# -------------------------------------------
+# -------------------------------------------
+# -------------------------------------------
+# 
+# -------------------------------------------
+# L'adresse IP que le serveur Gogs utilisera.
+# -------------------------------------------
+# 		=> à modifier éventuellement au docker build [docker build --build-arg ADRESSE_IP_SERV_GOGS=127.0.0.1]
+# 		=> et si l'argument [--build-arg ADRESSE_IP_SERV_GOGS=...] n'est pas utilisé au build de l'image, alors
+# 		   la variable d'environnement [$ADRESSE_IP_SRV_GOGS] prend la valeur par défaut de l'argument [$ADRESSE_IP_SERV_GOGS], ce
+# 		   qui garantit une valeur par défaut pour la variable d'environnement [$ADRESSE_IP_SRV_GOGS].
+ARG ADRESSE_IP_SERV_GOGS=0.0.0.0
+# La valeur par défaut de la variable d'environnement [$ADRESSE_IP_SRV_GOGS] est 0.0.0.0
+# 		=> Au [docker run ], on pourra redéfinir la valeur de cette variable d'environnement avec la syntaxe:
+# 		docker run --name monpetitconteneur -e ADRESSE_IP_SRV_GOGS=192.168.1.32 -d $NOMIMAGE
+ENV ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_SERV_GOGS
+# -------------------------------------------
+# Le répertorie d'isntallation de GOGS
+# -------------------------------------------
+# 		=> à modifier éventuellement au docker build [docker build $NOMIMAGE --build-arg REP_GOGS=127.0.0.1]
+ARG REP_GOGS=/opt/gogs
+# La valeur par défaut de la variable d'environnement [$REPERTOIRE_GOGS] est "/opt/gogs"
+# 		=> Au [docker run ], on pourra redéfinir la valeur de cette variable d'environnement avec la syntaxe:
+# 		docker run --name monpetitconteneur -e REPERTOIRE_GOGS=192.168.1.32 -d $NOMIMAGE
+ENV REPERTOIRE_GOGS=$REP_GOGS
+
+
+ARG REP_OPERATIONS=$(pwd)
+ENV MAISON_OPERATIONS=$REP_OPERATIONS
+
+ARG REP_DEPENDANCES_GOGS_IO=$REP_OPERATIONS/dependances
+ENV DEPENDANCES_GOGS_IO
+
+ARG NOMDUFICHIERLOG="$(pwd)/provision-gogsy.log"
+ENV NOMFICHIERLOG
+
+
+
+# -------------------------------------------
+# -------------------------------------------
+# -------------------------------------------
+# 						ops
+# -------------------------------------------
+# -------------------------------------------
+# -------------------------------------------
+RUN rm -f $NOMFICHIERLOG
+RUN touch $NOMFICHIERLOG
+
+
+
+echo " +++provision+gogsy+  COMMENCEE  - " >> $NOMFICHIERLOG
+
+
+# PARTIE INTERACTIVE
+demander_repertoireInstall
+demander_addrIP
+
+
+# PARTIE SILENCIEUSE
+
+# update CentOS 7
+sudo yum clean all -y && sudo yum update -y
+
+# création des répertoires utilisés par les opérations
+# mkdir -p $MAISON_OPERATIONS
+mkdir -p $DEPENDANCES_GOGS_IO
+sudo mkdir -p $REPERTOIRE_GOGS
+sudo chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS
+
+cd $MAISON_OPERATIONS
+
+######################
+# Installation Docker
+# Pour la création du conteneur docker pour la BDD Gogs, cf. provision-bdd.sh
+sudo chmod +x ./docker-BARE-METAL-SETUP.sh >> $NOMFICHIERLOG
+
+./docker-BARE-METAL-SETUP.sh
+
+
+############# 
+############# 
+############# >>>>>>>>>>>>>>>>     Les instructions ci-dessous sont à coller dans un dockerfile.
+############# >>>>>>>>>>>>>>>>     Les variables d'envionnement utilisées dans les instructions
+############# >>>>>>>>>>>>>>>>     ci-dessous, doivent devenir des varibles d'environnement du 
+############# >>>>>>>>>>>>>>>>     conteneur docker, qui seront utilisées au docker run avec l'option "-e"
+############# 
+############# 
+
+#####################
+# Installation de Git
+echo " +++provision+gogsy+ Installation de Git"
+echo " +++provision+gogsy+ Installation de Git" >> $NOMFICHIERLOG
+sudo yum install -y git >> $NOMFICHIERLOG
+echo " +++provision+gogsy+ Fin Installation de Git"
+echo " +++provision+gogsy+ Installation de Git" >> $NOMFICHIERLOG
+
+# Je résouds les dépendances, pour terminer l'installation de Gogs. 
+# J'écrirai un script séparé pour procéder à la configuration de l'isntance Gogs.
+resoudreDependances
+
+
+
+sudo yum install -y unzip >> $NOMFICHIERLOG
+
+clear
+
+echo "------"
+echo "------"
+echo "------"
+echo "------"
+echo "DEBUG  Juste avant unzip "
+echo " "
+echo " -- Contenu de [DEPENDANCES_GOGS_IO=$DEPENDANCES_GOGS_IO] ( doit contenir \"linux_amd64.zip\"): "
+sudo ls -all $DEPENDANCES_GOGS_IO
+echo "------"
+echo " "
+echo " -- Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
+sudo ls -all $REPERTOIRE_GOGS/..
+echo "------"
+echo " "
+echo " -- Contenu Répertoire [REPERTOIRE_GOGS=$REPERTOIRE_GOGS]: "
+sudo ls -all $REPERTOIRE_GOGS
+echo "------"
+echo "------"
+echo "------"
+echo "-----	  Commande droits sur répertoire : "
+echo "-----	[ PROVISIONING_USER=$PROVISIONING_USER] "
+echo "-----	[ PROVISIONING_USERGROUP=$PROVISIONING_USERGROUP] "
+echo "-----	[ chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS ] "
+echo "------"
+echo "------"
+echo "------"
+echo "------"
+echo "---	Pressez une touche pour poursuivre les opérations "
+read deboggue
+
+RUN  unzip $DEPENDANCES_GOGS_IO/linux_amd64.zip -d $REPERTOIRE_GOGS
+
+RUN  chown -R $PROVISIONING_USER:$PROVISIONING_USERGROUP $REPERTOIRE_GOGS
+
+RUN cd $REPERTOIRE_GOGS/gogs
+
+
+# Je sais pas pourquoi, j'ai juste testé / vérifié en suivant les tickets Gogs
+# J'ai testé:
+#   - que sans installer toutes ces dépendances, le serveur gogs ne démarre pas.
+#   - qu'après avoir installé touters ces dépedances, le serveur Gogs démarre et
+#     demande la configurationde la bdd et la configuration réseau du serveur (ports et interfaces réseau utilisées)
+#   
+RUN yum install -y glibc.i686 libstdc++.so.6 pam.i686 ksh
+# TODO: reconfiguration de Gogs avec l'adresse IP et le numéro de port paramétrant ce Dockerfile.
+CMD ["./gogs", "web"]
