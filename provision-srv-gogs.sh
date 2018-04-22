@@ -23,6 +23,11 @@
 # export NO_PORT_SRV_GOGS
 # export NO_PORT_SRV_GOGS_PAR_DEFAUT
 # NO_PORT_SRV_GOGS_PAR_DEFAUT=4000
+# - 
+# export NO_PORT_SSH_SRV_GOGS
+# export NO_PORT_SSH_SRV_GOGS_PAR_DEFAUT
+# NO_PORT_SSH_SRV_GOGS_PAR_DEFAUT=23
+
 # -
 export NOM_IMAGE_GOGS_IO
 NOM_IMAGE_GOGS_IO=kytes-gogs-io:v0
@@ -125,15 +130,17 @@ echo " "
 echo " "
 echo " "
 echo " --  [ADRESSE_IP_SRV_GOGS=$ADRESSE_IP_SRV_GOGS]  "
-echo " --  [NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS]  "
+echo " --  [NO_PORT_SRV_GOGS=$NO_PORT_SRV_GOGS]  "
 echo " --  [NOM_IMAGE_GOGS_IO=$NOM_IMAGE_GOGS_IO]  "
 echo " --  [NOM_CONTNEUR_SRV_GOGS=$NOM_CONTNEUR_SRV_GOGS]  "
 echo " "
 echo "------"
 echo "---	Pressez une touche pour poursuivre les opérations "
 read deboggue
+# 2 numéros de ports sont utilisés par Gogs.io  :   HTTP 3000   SSH 22
+LISTE_OPTION_RESEAU=" -e $ADRESSE_IP_SRV_GOGS:$NO_PORT_SRV_GOGS:3000"
+LISTE_OPTION_RESEAU="$LISTE_OPTION_RESEAU -e $ADRESSE_IP_SRV_GOGS:$NO_PORT_SSH_SRV_GOGS:22"
 
-LISTE_OPTION_RESEAU=" -e $ADRESSE_IP_SRV_GOGS:$NO_PORT_BDD_GOGS"
 sudo docker run --name $NOM_CONTNEUR_SRV_GOGS --restart=always $NOM_IMAGE_GOGS_IO
 
 # Attention!: à cet instant précis, les heathcheck n'ont pas encore été faits.

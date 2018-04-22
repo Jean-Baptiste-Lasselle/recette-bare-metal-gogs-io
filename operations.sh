@@ -31,6 +31,10 @@ export NO_PORT_SRV_GOGS
 export NO_PORT_SRV_GOGS_PAR_DEFAUT
 NO_PORT_SRV_GOGS_PAR_DEFAUT=4000
 # - 
+export NO_PORT_SSH_SRV_GOGS
+export NO_PORT_SSH_SRV_GOGS_PAR_DEFAUT
+NO_PORT_SSH_SRV_GOGS_PAR_DEFAUT=23
+# - 
 export ADRESSE_IP_BDD_GOGS
 export ADRESSE_IP_BDD_GOGS_PAR_DEFAUT
 ADRESSE_IP_BDD_GOGS_PAR_DEFAUT=0.0.0.0
@@ -82,8 +86,6 @@ demander_noportIP_BddGogs () {
 	echo "Quel numéro de port IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
 	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
 	echo " "
-	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
-	echo " "
 	read NOPORT_IP_CHOISIT
 	if [ "x$NOPORT_IP_CHOISIT" = "x" ]; then
        NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS_PAR_DEFAUT
@@ -134,10 +136,8 @@ demander_addrIP_ServeurGogs () {
 # script, quelle est le numéro de port IP, dans l'hôte Docker, que l'instance de SGBDR pourra utiliser
 demander_noportIP_ServeurGogs () {
 
-	echo "Quel numéro de port IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
+	echo "Quel numéro de port IP souhaitez-vous que le serveur Gogs utilise?"
 	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
-	echo " "
-	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
 	echo " "
 	read NOPORT_IP_CHOISIT
 	if [ "x$NOPORT_IP_CHOISIT" = "x" ]; then
@@ -147,6 +147,27 @@ demander_noportIP_ServeurGogs () {
 	fi
 	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NO_PORT_BDD_GOGS";
 }
+# --------------------------------------------------------------------------------------------------------------------------------------------
+# Cette fonction permet de demander interactivement à l'utilisateur du
+# script, quelle est le numéro de port IP, dans l'hôte Docker, utilisable
+# pour se conencter en SSH à l'instance de Gogs
+demander_noportIP_ServeurSSHGogs () {
+
+	echo "Quel numéro de port IP souhaitez-vous que le SGBDR de la BDD Gogs utilise?"
+	echo "Le numéro de port par défaut sera: [$NO_PORT_BDD_GOGS_PAR_DEFAUT] "
+	echo " "
+	ip addr|grep "inet"|grep -v "inet6"|grep "enp\|wlan"
+	echo " "
+	read NOPORTSSH_IP_CHOISIT
+	if [ "x$NOPORTSSH_IP_CHOISIT" = "x" ]; then
+       NO_PORT_SSH_SRV_GOGS=$NO_PORT_SSH_SRV_GOGS_PAR_DEFAUT
+	else
+      NO_PORT_SSH_SRV_GOGS=$NOPORTSSH_IP_CHOISIT
+	fi
+	echo " Binding numéro port IP choisit pour le SGBDR de la BDD Gogs: $NO_PORT_SSH_SRV_GOGS";
+}
+
+
 export WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY
 # WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY=https://github.com/gogits/gogs/releases/download/v0.11.43/linux_amd64.zip
 # WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY=https://dl.gogs.io/0.11.43/gogs_0.11.43_linux_amd64.zip
@@ -195,7 +216,7 @@ demander_noportIP_BddGogs
 demander_mdp_BddGogs
 demander_addrIP_ServeurGogs
 demander_noportIP_ServeurGogs
-
+demander_noportIP_ServeurSSHGogs
 
 # PARTIE SILENCIEUSE
 

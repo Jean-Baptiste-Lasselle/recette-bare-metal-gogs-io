@@ -58,8 +58,11 @@ echo " +++provision+gogsy+bdd  COMMENCEE  - " >> $NOMFICHIERLOG
 # mkdir -p $MAISON_OPERATIONS
 cd $MAISON_OPERATIONS
 
-clear
 
+# 1 numéro de port est sont utilisé par PostGreSQL  :   5432
+LISTE_OPTION_RESEAU="-e $ADRESSE_IP_BDD_GOGS:$NO_PORT_BDD_GOGS:5432"
+# LISTE_OPTION_RESEAU="$LISTE_OPTION_RESEAU -e ....."
+clear
 echo "------"
 echo "------"
 echo "------"
@@ -77,13 +80,13 @@ echo " "
 echo " --  [ADRESSE_IP_BDD_GOGS=$ADRESSE_IP_BDD_GOGS]  "
 echo " --  [NO_PORT_BDD_GOGS=$NO_PORT_BDD_GOGS]  "
 echo " --  [MOTDEPASSEBDDGOGS=$MOTDEPASSEBDDGOGS]  "
+echo " --  [LISTE_OPTION_RESEAU=$LISTE_OPTION_RESEAU]  "
 echo " "
 echo "------"
 echo "---	Pressez une touche pour poursuivre les opérations "
 read deboggue
 
-
-sudo docker run --name some-postgres -e POSTGRES_PASSWORD=$MOTDEPASSEBDDGOGS -d postgres
+sudo docker run --name bdd-gogs.punky $LISTE_OPTION_RESEAU -d postgres
 
 ###############################
 # TODO: Création de la BDD gogs
