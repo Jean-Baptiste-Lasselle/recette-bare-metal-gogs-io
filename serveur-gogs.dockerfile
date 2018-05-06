@@ -99,7 +99,14 @@ RUN echo " +++provision+gogsy+ Installation de Git" >> $NOMFICHIERLOG
 #       mise en place, comme pour tous les produits développés à l'extérieur de
 #       l'organisation.
 #       Cette procédure peut être automatisée par un pipeline équipés de tests automatisés.
-RUN curl --insecure $WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY --output linux_amd64.zip
+#       
+#  ===>>    HOP LA pas du tout, en fait le problème qui m'a forcé à faire un
+#           téléchargement "insecure", c'est certainement le fait que l'heure système 
+#           de mon hôte docker est complètement décalée par raport à la date de début
+#           de validité du certificat SSL: il faut donc simplement synchroniser l'hôte
+#           docker sur un serveur NTP
+# RUN curl --insecure $WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY --output linux_amd64.zip
+RUN curl $WHERE_TO_FIND_MAIN_DISTRIBUTED_BINARY --output linux_amd64.zip
 RUN mv ./linux_amd64.zip $DEPENDANCES_GOGS_IO
 RUN yum install -y unzip >> $NOMFICHIERLOG
 
