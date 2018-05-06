@@ -412,7 +412,7 @@ checkHealth $NOM_CONTENEUR_BDD_GOGS
 # Ah, mais si la requête est lancé depusi l'intérieur du conteneur, alors.... il faut que j'utilsie le numéro~
 # de port 3000, qui est celui utilisé à l'intérieur du conteneur, puisque je ne change pas cette configuration Gogs à l'intérieur de mon conteneur.
 # Donc une requête http vers http://$ADRESSE_IP_SRV_GOGS:3000
-# Donc mieux, pour rendre le HEALTH_CHECK indépendant de la cible de déploiement, une requête http vers http://localhost:3000
+# Donc mieux, pour rendre le HEALTH_CHECK indépendant de              la cible de déploiement, une requête http vers http://localhost:3000
 # Ce HEALTH_CHECK peut être complété, indépendant de la recette de rpovision, par des tersts divers dont uen requête spécifique à la cible de déploiement, comme 
 checkHealth $NOM_CONTNEUR_SRV_GOGS
 
